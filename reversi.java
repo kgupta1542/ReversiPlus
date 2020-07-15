@@ -16,7 +16,6 @@ public class reversi extends JFrame{
         setTitle("Reversi");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
     }
     public static void main (String [] args){
         EventQueue.invokeLater(() -> {
