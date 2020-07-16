@@ -209,16 +209,60 @@ function indicatePotentialMoves(arr){
 }
 
 function whitePlayerTurn(){
+	var allPotentialMoves = new Array();
+	var tempArr;
+	
 	for(var i = 0; i < whitePieces.length; i++){//Find all potential moves for all pieces
-		indicatePotentialMoves(findPotentialMoves(whitePieces[i][0],whitePieces[i][1]));
+		tempArr = findPotentialMoves(whitePieces[i][0],whitePieces[i][1]);
+		if(tempArr.length > 0){
+			allPotentialMoves.push(tempArr);
+		}
+	}
+	
+	if(allPotentialMoves.length > 0){
+		for(var j = 0; j < allPotentialMoves.length; j++){
+			indicatePotentialMoves(allPotentialMoves[j]);
+		}
+	}
+	else{
+		return;
 	}
 }
 
 function blackPlayerTurn(){
+	var allPotentialMoves = new Array();
+	var tempArr;
+	
 	for(var i = 0; i < blackPieces.length; i++){//Find all potential moves for all pieces
-		indicatePotentialMoves(findPotentialMoves(blackPieces[i][0],blackPieces[i][1]));
+		tempArr = findPotentialMoves(blackPieces[i][0],blackPieces[i][1]);
+		if(tempArr.length > 0){
+			allPotentialMoves.push(tempArr);
+		}
+	}
+	
+	if(allPotentialMoves.length > 0){
+		for(var j = 0; j < allPotentialMoves.length; j++){
+			indicatePotentialMoves(allPotentialMoves[j]);
+		}
+	}
+	else{
+		return;
+	}
+}
+
+function gamePlay(){
+	var whiteLastTurn = false;
+	while(whitePieces.length + blackPieces.length < 64){
+		if(whiteLastTurn = false){
+			whitePlayerTurn();
+			whiteLastTurn = true;
+		}
+		else{
+			blackPlayerTurn();
+			whiteLastTurn = false;
+		}
 	}
 }
 
 initGame();
-blackPlayerTurn();
+whitePlayerTurn();
