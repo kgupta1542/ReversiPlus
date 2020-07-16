@@ -6,6 +6,7 @@ var tempArr = new Array();
 var possibleMoves = new Array();
 var flippablePieces = new Array();
 var tempFlippableArr = new Array();
+var flipPlusPieces = new Array();
 
 function toggleTurn(){
 	if(document.getElementById("turn").innerHTML == "White Player"){
@@ -118,7 +119,7 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 			i++;
 		}
 		if(hasPiece(row, col - i) == false){//2) there is an empty space
-			possibleMoves.push([row, col - i]);//This is a possible move
+			possibleMoves.push([row, col - i, "left"]);//This is a possible move
 		}
 	}
 	
@@ -129,7 +130,7 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 			i++;
 		}
 		if(hasPiece(row, col + i) == false){//2) there is an empty space
-			possibleMoves.push([row, col + i]);//This is a possible move
+			possibleMoves.push([row, col + i, "right"]);//This is a possible move
 		}
 	}
 	
@@ -141,7 +142,7 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 			i++;
 		}
 		if(hasPiece(row - i, col) == false){//2) there is an empty space
-			possibleMoves.push([row - i, col]);//This is a possible move
+			possibleMoves.push([row - i, col, "up"]);//This is a possible move
 		}
 	}
 	
@@ -153,7 +154,7 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 			i++;
 		}
 		if(hasPiece(row + i, col) == false){//2) there is an empty space
-			possibleMoves.push([row + i, col]);//This is a possible move
+			possibleMoves.push([row + i, col, "down"]);//This is a possible move
 		}
 	}
 	
@@ -161,11 +162,11 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 	nextType = getType(row - 1, col - 1);
 	if(nextType == oppType){
 		i = 2;//Initialize counter
-		while(row - i >= 0 && col - i >= 0 && getType(row, col - i) == oppType){//Stop searching if: 1) at end of board
+		while(row - i >= 0 && col - i >= 0 && getType(row - i, col - i) == oppType){//Stop searching if: 1) at end of board
 			i++;
 		}
 		if(hasPiece(row - i, col - i) == false){//2) there is an empty space
-			possibleMoves.push([row - i, col - i]);//This is a possible move
+			possibleMoves.push([row - i, col - i, "up-left"]);//This is a possible move
 		}
 	}
 	
@@ -177,7 +178,7 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 			i++;
 		}
 		if(hasPiece(row - i, col + i) == false){//2) there is an empty space
-			possibleMoves.push([row - i, col + i]);//This is a possible move
+			possibleMoves.push([row - i, col + i,"up-right"]);//This is a possible move
 		}
 	}
 	
@@ -189,7 +190,7 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 			i++;
 		}
 		if(hasPiece(row + i, col - i) == false){//2) there is an empty space
-			possibleMoves.push([row + i, col - i]);//This is a possible move
+			possibleMoves.push([row + i, col - i,"down-left"]);//This is a possible move
 		}
 	}
 	
@@ -201,7 +202,7 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 			i++;
 		}
 		if(hasPiece(row + i, col + i) == false){//2) there is an empty space
-			possibleMoves.push([row + i, col + i]);//This is a possible move
+			possibleMoves.push([row + i, col + i,"down-right"]);//This is a possible move
 		}
 	}
 	
@@ -330,11 +331,23 @@ function findFlippablePieces(row, col){//Search algorithm to identify all possib
 	return flippablePieces;
 }
 
-function flipPieces(type){
-	for(var i = 0; i < flippablePieces.length; i++){
-		createGamePiece(flippablePieces[i][0],flippablePieces[i][1],type);
+function flipPieces(arr, type){
+	for(var i = 0; i < arr.length; i++){
+		createGamePiece(arr[i][0],arr[i][1],type);
 	}
 	updateScore();
+}
+
+function flipPlus(type){
+	flippablePiecesCopy = JSON.parse(JSON.stringify(flippablePieces));
+	flipPlusPieces = [];
+	
+	for(var i = 0; i < flippablePiecesCopy.length; i++){
+		findFlippablePieces(flippablePiecesCopy[i][0],flippablePiecesCopy[i][1]);
+		flipPlusPieces = flipPlusPieces.concat(flippablePieces);
+	}
+	
+	flipPieces(flipPlusPieces,type);
 }
 
 function indicatePotentialMoves(){//Change color of potential moves and add event listener
@@ -360,7 +373,8 @@ function addWhitePiece(tar){
 		createGamePiece(selectedRow, selectedCol, "W");
 		board.removeEventListener("mousedown", addWhitePiece);
 		findFlippablePieces(selectedRow, selectedCol);
-		flipPieces("W");
+		flipPieces(flippablePieces, "W");
+		flipPlus("W");
 		clearPotentialMoves();
 		
 		if(whitePieces.length + blackPieces.length < 64){
@@ -380,7 +394,8 @@ function addBlackPiece(tar){
 		createGamePiece(selectedRow, selectedCol, "B");
 		board.removeEventListener("mousedown", addBlackPiece);
 		findFlippablePieces(selectedRow, selectedCol);
-		flipPieces("B");
+		flipPieces(flippablePieces, "B");
+		flipPlus("B");
 		clearPotentialMoves();
 		if(whitePieces.length + blackPieces.length < 64){
 			toggleTurn();
