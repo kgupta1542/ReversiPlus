@@ -7,6 +7,7 @@ var possibleMoves = new Array();
 var flippablePieces = new Array();
 var tempFlippableArr = new Array();
 var flipPlusPieces = new Array();
+var moves = 4;
 
 function toggleTurn(){
 	if(document.getElementById("turn").innerHTML == "White Player"){
@@ -375,9 +376,11 @@ function addWhitePiece(tar){
 		findFlippablePieces(selectedRow, selectedCol);
 		flipPieces(flippablePieces, "W");
 		flipPlus("W");
+		moves += 1;
+		
 		clearPotentialMoves();
 		
-		if(whitePieces.length + blackPieces.length < 64){
+		if(moves < 64){
 			toggleTurn();
 			blackPlayerTurn();
 		}
@@ -396,8 +399,11 @@ function addBlackPiece(tar){
 		findFlippablePieces(selectedRow, selectedCol);
 		flipPieces(flippablePieces, "B");
 		flipPlus("B");
+		moves += 1;
+		
 		clearPotentialMoves();
-		if(whitePieces.length + blackPieces.length < 64){
+		
+		if(moves < 64){
 			toggleTurn();
 			whitePlayerTurn();
 		}
