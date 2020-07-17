@@ -1,33 +1,37 @@
+//Global Variables======================================================================
 var whitePieces = new Array();//All white pieces on the board
 var blackPieces = new Array();//All black pieces on the board
-var board = document.getElementById("board");
-var allPotentialMoves = new Array();
-var tempArr = new Array();
-var possibleMoves = new Array();
-var flippablePieces = new Array();
-var tempFlippableArr = new Array();
-var flipPlusPieces = new Array();
-var moves = 4;
+var board = document.getElementById("board");//Board DOM element
+var allPotentialMoves = new Array();//All potential moves for a single turn
+var tempArr = new Array();//Temporary array for storage
+var potentialMoves = new Array();//Temporary array for potential moves of each search direction
+var flippablePieces = new Array();//All pieces that need to be flipped
+var tempFlippableArr = new Array();//Temporary array for flippable pieces in each search direction
+var flipPlusPieces = new Array();//All flip Plus pieces
+var moves = 4;//Number of pieces on board
+var turn = document.getElementById("turn");//Turn DOM Element
 
-function toggleTurn(){
-	if(document.getElementById("turn").innerHTML == "White Player"){
-		document.getElementById("turn").innerText = "Black Player";
+//UI Controls========================================================================================
+function toggleTurn(){//Changes turn on UI
+	if(turn.innerHTML == "White Player"){
+		turn.innerHTML = "Black Player";
 	}
 	else{
-		document.getElementById("turn").innerText = "White Player";
+		turn.innerHTML = "White Player";
 	}
 }
 
-function updateScore(){
+function updateScore(){//Updates score on UI
 	document.getElementById("whiteScore").innerText = whitePieces.length;
 	document.getElementById("blackScore").innerText = blackPieces.length;
 }
 
-function getUnit(row, col){//Get DOM object at soecified coordinate
+//Game Play Setup=====================================================================================
+function getUnit(row, col){//Get DOM object at specified coordinate
 	return document.getElementsByClassName("row")[row].children[col];
 }
 
-function getType(row, col){
+function getType(row, col){//Get color of piece at specified coordinate
 	if(hasPiece(row, col)){
 		return getUnit(row, col).children[0].className;
 	}
@@ -36,20 +40,21 @@ function getType(row, col){
 	}
 }
 
-function hasPiece(row, col){
+function hasPiece(row, col){//Returns:
 	if(row <= 7 && col <= 7 && row >= 0 && col >= 0){
 		if(getUnit(row, col).childElementCount > 0){
-			return true;
+			return true;//If there is a piece
 		}
 		else{
-			return false;
+			return false;//If there is an empty cell
 		}
 	}
 	else{
-		return null;
+		return null;//If specified coordinate is off the board
 	}
 }
     
+//Game Piece Creation==============================================================================
 function createGamePieceElement(type){//Create specificied game piece
 	var piece;
 	if(type == "W"){
@@ -71,12 +76,12 @@ function createGamePieceElement(type){//Create specificied game piece
 	}
 }
 
-function createGamePiece(row, col, type){
-	removeGamePiece(row,col,type);
-	getUnit(row,col).appendChild(createGamePieceElement(type));
-	getUnit(row,col).style.backgroundColor == "white";
+function createGamePiece(row, col, type){//Loads game piece in specified unit
+	removeGamePiece(row,col,type);//Clears cell
+	getUnit(row,col).appendChild(createGamePieceElement(type));//Loads game piece
+	getUnit(row,col).style.backgroundColor == "#2eae52";//Removes highlight
 	
-	if(type == "W"){
+	if(type == "W"){//Adds cell to corresponding array
 		whitePieces.push([row, col]);
 	}
 	else{
@@ -84,7 +89,7 @@ function createGamePiece(row, col, type){
 	}
 }
 
-function removeGamePiece(row,col,type){
+function removeGamePiece(row,col,type){//Clears game piece from game board and local array
 	var searchArr = (type == "W") ? blackPieces : whitePieces;
 	for(var i = 0; i < searchArr.length; i++){
 		if(JSON.stringify(searchArr[i]) == JSON.stringify([row,col])){
@@ -95,20 +100,12 @@ function removeGamePiece(row,col,type){
 	getUnit(row,col).innerHTML = "";
 }
 
-function initGame(){//Create beginning 4 pieces on board
-	createGamePiece(3,3,"W");
-	createGamePiece(3,4,"B");
-	createGamePiece(4,4,"W");
-	createGamePiece(4,3,"B");
-	
-	updateScore();
-}
-
+//Potential Moves=================================================================================================
 function findPotentialMoves(row, col){//Search algorithm to identify all possible move locations
 	var type = getType(row, col);
 	var oppType = (type == "W") ? "B" : "W";
 	
-	possibleMoves = [];
+	potentialMoves = [];//Clear potential moves
 	var i;
 	var nextType;
 	
@@ -116,22 +113,23 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 	nextType = getType(row, col - 1);
 	if(nextType == oppType){
 		i = 2;//Initialize counter
-		while(col - i >= 0 && getType(row, col - i) == oppType){//Stop searching if: 1) at end of board
+		while(col - i >= 0 && getType(row, col - i) == oppType){//Keep searching while you're on the board and are on an opponent piece
 			i++;
 		}
 		if(hasPiece(row, col - i) == false){//2) there is an empty space
-			possibleMoves.push([row, col - i, "left"]);//This is a possible move
+			potentialMoves.push([row, col - i, "left"]);//This is a possible move
 		}
 	}
 	
+	//Search to right
 	nextType = getType(row, col + 1);
 	if(nextType == oppType){
 		i = 2;//Initialize counter
-		while(col + i <= 7 && getType(row, col + i) == oppType){//Stop searching if: 1) at end of board
+		while(col + i <= 7 && getType(row, col + i) == oppType){//Keep searching while you're on the board and are on an opponent piece
 			i++;
 		}
-		if(hasPiece(row, col + i) == false){//2) there is an empty space
-			possibleMoves.push([row, col + i, "right"]);//This is a possible move
+		if(hasPiece(row, col + i) == false){//If there is an empty space
+			potentialMoves.push([row, col + i, "right"]);//This is a possible move
 		}
 	}
 	
@@ -139,11 +137,11 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 	nextType = getType(row - 1, col);
 	if(nextType == oppType){
 		i = 2;//Initialize counter
-		while(row - i >= 0 && getType(row - i, col) == oppType){//Stop searching if: 1) at end of board
+		while(row - i >= 0 && getType(row - i, col) == oppType){//Keep searching while you're on the board and are on an opponent piece
 			i++;
 		}
-		if(hasPiece(row - i, col) == false){//2) there is an empty space
-			possibleMoves.push([row - i, col, "up"]);//This is a possible move
+		if(hasPiece(row - i, col) == false){//If there is an empty space
+			potentialMoves.push([row - i, col, "up"]);//This is a possible move
 		}
 	}
 	
@@ -151,11 +149,11 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 	nextType = getType(row + 1, col);
 	if(nextType == oppType){
 		i = 2;//Initialize counter
-		while(row + i <= 7 && getType(row + i, col) == oppType){//Stop searching if: 1) at end of board
+		while(row + i <= 7 && getType(row + i, col) == oppType){//Keep searching while you're on the board and are on an opponent piece
 			i++;
 		}
-		if(hasPiece(row + i, col) == false){//2) there is an empty space
-			possibleMoves.push([row + i, col, "down"]);//This is a possible move
+		if(hasPiece(row + i, col) == false){//If there is an empty space
+			potentialMoves.push([row + i, col, "down"]);//This is a possible move
 		}
 	}
 	
@@ -163,11 +161,11 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 	nextType = getType(row - 1, col - 1);
 	if(nextType == oppType){
 		i = 2;//Initialize counter
-		while(row - i >= 0 && col - i >= 0 && getType(row - i, col - i) == oppType){//Stop searching if: 1) at end of board
+		while(row - i >= 0 && col - i >= 0 && getType(row - i, col - i) == oppType){//Keep searching while you're on the board and are on an opponent piece
 			i++;
 		}
-		if(hasPiece(row - i, col - i) == false){//2) there is an empty space
-			possibleMoves.push([row - i, col - i, "up-left"]);//This is a possible move
+		if(hasPiece(row - i, col - i) == false){//If there is an empty space
+			potentialMoves.push([row - i, col - i, "up-left"]);//This is a possible move
 		}
 	}
 	
@@ -175,11 +173,11 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 	nextType = getType(row - 1, col + 1);
 	if(nextType == oppType){
 		i = 2;//Initialize counter
-		while(row - i >= 0 && col + i <= 7 && getType(row - i, col + i) == oppType){//Stop searching if: 1) at end of board
+		while(row - i >= 0 && col + i <= 7 && getType(row - i, col + i) == oppType){//Keep searching while you're on the board and are on an opponent piece
 			i++;
 		}
-		if(hasPiece(row - i, col + i) == false){//2) there is an empty space
-			possibleMoves.push([row - i, col + i,"up-right"]);//This is a possible move
+		if(hasPiece(row - i, col + i) == false){//If there is an empty space
+			potentialMoves.push([row - i, col + i,"up-right"]);//This is a possible move
 		}
 	}
 	
@@ -187,11 +185,11 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 	nextType = getType(row + 1, col - 1);
 	if(nextType == oppType){
 		i = 2;//Initialize counter
-		while(row + i <= 7 && col - i >= 0 && getType(row + i, col - i) == oppType){//Stop searching if: 1) at end of board
+		while(row + i <= 7 && col - i >= 0 && getType(row + i, col - i) == oppType){//Keep searching while you're on the board and are on an opponent piece
 			i++;
 		}
-		if(hasPiece(row + i, col - i) == false){//2) there is an empty space
-			possibleMoves.push([row + i, col - i,"down-left"]);//This is a possible move
+		if(hasPiece(row + i, col - i) == false){//If there is an empty space
+			potentialMoves.push([row + i, col - i,"down-left"]);//This is a possible move
 		}
 	}
 	
@@ -199,17 +197,34 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 	nextType = getType(row + 1, col + 1);
 	if(nextType == oppType){
 		i = 2;//Initialize counter
-		while(row + i <= 7 && col + i <= 7 && getType(row + i, col + i) == oppType){//Stop searching if: 1) at end of board
+		while(row + i <= 7 && col + i <= 7 && getType(row + i, col + i) == oppType){//Keep searching while you're on the board and are on an opponent piece
 			i++;
 		}
-		if(hasPiece(row + i, col + i) == false){//2) there is an empty space
-			possibleMoves.push([row + i, col + i,"down-right"]);//This is a possible move
+		if(hasPiece(row + i, col + i) == false){//If there is an empty space
+			potentialMoves.push([row + i, col + i,"down-right"]);//This is a possible move
 		}
 	}
 	
-	return possibleMoves;
+	return potentialMoves;
 }
 
+function indicatePotentialMoves(){//Highlight all potential moves
+	for(var i = 0; i < allPotentialMoves.length; i++){
+		for(var j = 0; j < allPotentialMoves[i].length; j++){
+			getUnit(allPotentialMoves[i][j][0],allPotentialMoves[i][j][1]).style.backgroundColor = "#4eee92";
+		}
+	}
+}
+
+function clearPotentialMoves(){//Reset all highlighted potential moves
+	for(var i = 0; i < allPotentialMoves.length; i++){
+		for(var j = 0; j < allPotentialMoves[i].length; j++){
+			getUnit(allPotentialMoves[i][j][0],allPotentialMoves[i][j][1]).style.backgroundColor = "#2eae52";
+		}
+	}
+}
+
+//Flip Pieces (including Flip Plus)============================================================================
 function findFlippablePieces(row, col){//Search algorithm to identify all possible move locations
 	var type = getType(row, col);
 	var oppType = (type == "W") ? "B" : "W";
@@ -351,38 +366,35 @@ function flipPlus(type){
 	flipPieces(flipPlusPieces,type);
 }
 
-function indicatePotentialMoves(){//Change color of potential moves and add event listener
-	for(var i = 0; i < allPotentialMoves.length; i++){//Color in all potential moves for all pieces
-		for(var j = 0; j < allPotentialMoves[i].length; j++){
-			getUnit(allPotentialMoves[i][j][0],allPotentialMoves[i][j][1]).style.backgroundColor = "beige";
-		}
-	}
+//Gameplay ==================================================================================================
+function initGame(){//Create beginning 4 pieces on board
+	createGamePiece(3,3,"W");
+	createGamePiece(3,4,"B");
+	createGamePiece(4,4,"W");
+	createGamePiece(4,3,"B");
+	
+	updateScore();
 }
 
-function clearPotentialMoves(){
-	for(var i = 0; i < allPotentialMoves.length; i++){//Color in all potential moves for all pieces
-		for(var j = 0; j < allPotentialMoves[i].length; j++){
-			getUnit(allPotentialMoves[i][j][0],allPotentialMoves[i][j][1]).style.backgroundColor = "white";
-		}
-	}
-}
-
-function addWhitePiece(tar){
-	if (tar.target.classList[0] === 'unit' && tar.target.style.backgroundColor == "beige") {
+function addPiece(tar){
+	var type = (turn.innerHTML == "White Player") ? "W" : "B";
+	var oppType = (type == "W") ? "B" : "W";
+	
+	if (tar.target.classList[0] === 'unit' && tar.target.style.backgroundColor == "rgb(78, 238, 146)") {
     	var selectedRow = parseInt(tar.target.parentElement.id.substring(4));
 		var selectedCol = parseInt(tar.target.classList[1].substring(4));
-		createGamePiece(selectedRow, selectedCol, "W");
-		board.removeEventListener("mousedown", addWhitePiece);
+		createGamePiece(selectedRow, selectedCol, type);
+		board.removeEventListener("mousedown", addPiece);
 		findFlippablePieces(selectedRow, selectedCol);
-		flipPieces(flippablePieces, "W");
-		flipPlus("W");
+		flipPieces(flippablePieces, type);
+		flipPlus(type);
 		moves += 1;
 		
 		clearPotentialMoves();
 		
-		if(moves < 64){
+		if(moves < 64 && blackPieces.length > 0 && whitePieces.length > 0){
 			toggleTurn();
-			blackPlayerTurn();
+			gamePlay(oppType);
 		}
 		else{
 			endGame();
@@ -390,35 +402,15 @@ function addWhitePiece(tar){
     }
 }
 
-function addBlackPiece(tar){
-	if (tar.target.classList[0] === 'unit' && tar.target.style.backgroundColor == "beige") {
-    	var selectedRow = parseInt(tar.target.parentElement.id.substring(4));
-		var selectedCol = parseInt(tar.target.classList[1].substring(4));
-		createGamePiece(selectedRow, selectedCol, "B");
-		board.removeEventListener("mousedown", addBlackPiece);
-		findFlippablePieces(selectedRow, selectedCol);
-		flipPieces(flippablePieces, "B");
-		flipPlus("B");
-		moves += 1;
-		
-		clearPotentialMoves();
-		
-		if(moves < 64){
-			toggleTurn();
-			whitePlayerTurn();
-		}
-		else{
-			endGame();
-		}
-    }
-}
-
-function whitePlayerTurn(){//Gameplay for white player
+function gamePlay(type){
+	var searchArr = (turn.innerHTML == "White Player") ? whitePieces : blackPieces;
+	var oppType = (turn.innerHTML == "White Player") ? "B" : "W";
+	
 	allPotentialMoves = [];
 	tempArr = [];
 	
-	for(var i = 0; i < whitePieces.length; i++){//Find all potential moves for all pieces
-		tempArr = findPotentialMoves(whitePieces[i][0],whitePieces[i][1]);
+	for(var i = 0; i < searchArr.length; i++){//Find all potential moves for all pieces
+		tempArr = findPotentialMoves(searchArr[i][0],searchArr[i][1]);
 		if(tempArr.length > 0){
 			allPotentialMoves.push(tempArr);
 		}
@@ -428,43 +420,22 @@ function whitePlayerTurn(){//Gameplay for white player
 		indicatePotentialMoves();
 	}
 	else{//If there are no potential moves, skip turn
-		blackPlayerTurn();
+		toggleTurn();
+		gamePlay(oppType);
+		console.log("There are no moves. Giving turn to player: " + oppType);
 	}
 	
-	board.addEventListener('mousedown', addWhitePiece, false);
-}
-
-function blackPlayerTurn(){
-	allPotentialMoves = [];
-	tempArr = [];
-	
-	for(var i = 0; i < blackPieces.length; i++){//Find all potential moves for all pieces
-		tempArr = findPotentialMoves(blackPieces[i][0],blackPieces[i][1]);
-		if(tempArr.length > 0){
-			allPotentialMoves.push(tempArr);
-		}
-	}
-	
-	if(allPotentialMoves.length > 0){
-		for(var j = 0; j < allPotentialMoves.length; j++){
-			indicatePotentialMoves(allPotentialMoves[j]);
-		}
-	}
-	else{
-		whitePlayerTurn();
-	}
-	
-	board.addEventListener('mousedown', addBlackPiece, false);
+	board.addEventListener('mousedown', addPiece, false);
 }
 
 function endGame(){
 	if(blackPieces.length > whitePieces.length){
-		document.getElementById("turn").parentElement.innerText = "Black Player Wins!";
+		turn.parentElement.innerText = "Black Player Wins!";
 	}
 	else{
-		document.getElementById("turn").parentElement.innerText = "White Player Wins!";
+		turn.parentElement.innerText = "White Player Wins!";
 	}
 }
 
 initGame();
-whitePlayerTurn();
+gamePlay("W");
