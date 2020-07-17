@@ -3,6 +3,25 @@
 	<head>
 		<title>Reversi Plus</title>
 		<style>
+			#board{
+				display:inline-block;
+			}
+			#ui{
+				display:inline-block;
+				vertical-align:top;
+				padding-right:20px;
+				width:300px;
+			}
+			.label{
+				display:inline-block;
+				height:50px;
+				width:50px;
+				font-size:2em;
+				vertical-align:bottom;
+			}
+			.num-label{
+				padding-left:10px;
+			}
 			.row{
 				display:block
 			}
@@ -10,7 +29,8 @@
 				display:inline-block;
 				height:50px;
 				width:50px;
-				outline: 4px solid black
+				outline: 4px solid black;
+				background-color:#2eae52
 			}
 			.u{
 				text-decoration:underline;	
@@ -18,10 +38,22 @@
 		</style>
 	</head>
 	<body>
-		<h2><span class="u">Turn:</span> <span id="turn">White Player</span></h2>
-		<h3><span class="u">White Score:</span> <span id="whiteScore"></span></h3>
-		<h3><span class="u">Black Score:</span> <span id="blackScore"></span></h3>
+		<div id="ui">
+			<h2><span class="u">Turn:</span> <span id="turn">White Player</span></h2>
+			<h3><span class="u">White Score:</span> <span id="whiteScore"></span>&nbsp;<span class="u">Black Score:</span> <span id="blackScore"></span></h3>
+		</div>
+			
 		<div id=board>
+			<div id="letter-label">
+				<div class="label" style="text-align:center">A</div>
+				<div class="label" style="text-align:center">B</div>
+				<div class="label" style="text-align:center">C</div>
+				<div class="label" style="text-align:center">D</div>
+				<div class="label" style="text-align:center">E</div>
+				<div class="label" style="text-align:center">F</div>
+				<div class="label" style="text-align:center">G</div>
+				<div class="label" style="text-align:center">H</div>
+			</div>
 			<div class="row" id="row_0">
 				<div class="unit col_0"></div>
 				<div class="unit col_1"></div>
@@ -31,6 +63,7 @@
 				<div class="unit col_5"></div>
 				<div class="unit col_6"></div>
 				<div class="unit col_7"></div>
+				<div class="num-label label">1</div>
 			</div>
 			<div class="row" id="row_1">
 				<div class="unit col_0"></div>
@@ -41,6 +74,7 @@
 				<div class="unit col_5"></div>
 				<div class="unit col_6"></div>
 				<div class="unit col_7"></div>
+				<div class="num-label label">2</div>
 			</div>
 			<div class="row" id="row_2">
 				<div class="unit col_0"></div>
@@ -51,6 +85,7 @@
 				<div class="unit col_5"></div>
 				<div class="unit col_6"></div>
 				<div class="unit col_7"></div>
+				<div class="num-label label">3</div>
 			</div>
 			<div class="row" id="row_3">
 				<div class="unit col_0"></div>
@@ -61,6 +96,7 @@
 				<div class="unit col_5"></div>
 				<div class="unit col_6"></div>
 				<div class="unit col_7"></div>
+				<div class="num-label label">4</div>
 			</div>
 			<div class="row" id="row_4">
 				<div class="unit col_0"></div>
@@ -71,6 +107,7 @@
 				<div class="unit col_5"></div>
 				<div class="unit col_6"></div>
 				<div class="unit col_7"></div>
+				<div class="num-label label">5</div>
 			</div>
 			<div class="row" id="row_5">
 				<div class="unit col_0"></div>
@@ -81,6 +118,7 @@
 				<div class="unit col_5"></div>
 				<div class="unit col_6"></div>
 				<div class="unit col_7"></div>
+				<div class="num-label label">6</div>
 			</div>
 			<div class="row" id="row_6">
 				<div class="unit col_0"></div>
@@ -91,6 +129,7 @@
 				<div class="unit col_5"></div>
 				<div class="unit col_6"></div>
 				<div class="unit col_7"></div>
+				<div class="num-label label">7</div>
 			</div>
 			<div class="row" id="row_7">
 				<div class="unit col_0"></div>
@@ -101,6 +140,7 @@
 				<div class="unit col_5"></div>
 				<div class="unit col_6"></div>
 				<div class="unit col_7"></div>
+				<div class="num-label label">8</div>
 			</div>
 		</div>
 	</body>
