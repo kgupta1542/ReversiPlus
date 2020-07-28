@@ -10,15 +10,37 @@ var tempFlippableArr = new Array();//Temporary array for flippable pieces in eac
 var flipPlusPieces = new Array();//All flip Plus pieces
 var moves = 4;//Number of pieces on board
 var turn = document.getElementById("turn");//Turn DOM Element
+var mode = document.getElementById("gameMode");
+var reset = document.getElementById("reset");
 
 //UI Controls========================================================================================
 function toggleTurn(){//Changes turn on UI
-	if(turn.innerHTML == "White Player"){
-		turn.innerHTML = "Black Player";
+	var text = (turn.innerHTML == "White Player") ? "Black Player" : "White Player";
+	turn.innerHTML = text;
+}
+
+mode.addEventListener('mousedown', toggleMode, false);
+
+function toggleMode(){
+	var text = (mode.innerHTML == "Plus Mode") ? "Classic" : "Plus Mode";
+	mode.innerHTML = text;
+}
+
+reset.addEventListener('mousedown', resetBoard, false);
+
+function resetBoard(){
+	for(var i = 0; i < 8; i++){
+		for(var j = 0; j < 8; j++){
+			getUnit(i,j).innerHTML = "";
+		}
 	}
-	else{
-		turn.innerHTML = "White Player";
-	}
+	
+	whitePieces = [];
+	blackPieces = [];
+	
+	clearPotentialMoves();
+	initGame();
+	gamePlay("W");
 }
 
 function updateScore(){//Updates score on UI
@@ -368,6 +390,8 @@ function flipPlus(type){
 
 //Gameplay ==================================================================================================
 function initGame(){//Create beginning 4 pieces on board
+	turn.innerHTML = "White Player";
+	
 	createGamePiece(3,3,"W");
 	createGamePiece(3,4,"B");
 	createGamePiece(4,4,"W");
@@ -387,7 +411,11 @@ function addPiece(tar){
 		board.removeEventListener("mousedown", addPiece);
 		findFlippablePieces(selectedRow, selectedCol);
 		flipPieces(flippablePieces, type);
-		flipPlus(type);
+		
+		if(mode.innerHTML == "Plus Mode"){
+			flipPlus(type);
+		}
+		
 		moves += 1;
 		
 		clearPotentialMoves();
