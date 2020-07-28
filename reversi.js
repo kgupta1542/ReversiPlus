@@ -376,7 +376,7 @@ function flipPieces(arr, type){
 	updateScore();
 }
 
-function flipPlus(type){
+function findFlipPlusPieces(type){
 	flippablePiecesCopy = JSON.parse(JSON.stringify(flippablePieces));
 	flipPlusPieces = [];
 	
@@ -384,8 +384,6 @@ function flipPlus(type){
 		findFlippablePieces(flippablePiecesCopy[i][0],flippablePiecesCopy[i][1]);
 		flipPlusPieces = flipPlusPieces.concat(flippablePieces);
 	}
-	
-	flipPieces(flipPlusPieces,type);
 }
 
 //Gameplay ==================================================================================================
@@ -413,7 +411,8 @@ function addPiece(tar){
 		flipPieces(flippablePieces, type);
 		
 		if(mode.innerHTML == "Plus Mode"){
-			flipPlus(type);
+			findFlipPlusPieces(type);
+			flipPieces(flipPlusPieces,type);
 		}
 		
 		moves += 1;
