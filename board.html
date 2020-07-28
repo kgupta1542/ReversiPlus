@@ -16,7 +16,7 @@
 			    background-color: #2eae52;
 			    padding-left: 15px;
 			    padding-bottom: 10px;
-			    width: 270px;
+			    width: 275px;
 			    color: white;
 			    border-radius: 15px;
 			    box-shadow: 0px 0px 0px 3px black;
@@ -63,7 +63,23 @@
 			    box-shadow: 0px 0 0px 2px black;
 			    margin-top: 15px;
 			    display: inline;
-			    margin-right: 25px;
+			    margin-right: 15px;
+			    font-family: monospace;
+			    font-weight: bolder;
+			}
+			#endGame{
+				display:none;
+			}
+			#oppPlayerLevel{
+				display:none;
+			    background-color: #4eee92;
+			    color: black;
+			    font-size: 1.5em;
+			    border-radius: 15px;
+			    padding: 5px 11px 5px 11px;
+			    box-shadow: 0px 0 0px 2px black;
+			    margin-top: 15px;
+			    margin-right: 5px;
 			    font-family: monospace;
 			    font-weight: bolder;
 			}
@@ -73,10 +89,18 @@
 		<div id="player">
 			<div id="ui">
 				<h2 id="title">Reversi Plus</h2>
-				<button id="gameMode">Plus Mode</button><button id="reset">Reset</button>
+				<button id="gameMode">Plus Mode</button>
+				<button id="oppPlayerType">vs Human</button>
+				<select id="oppPlayerLevel">
+				  <option value="1">Ver. 1</option>
+				  <option value="2">Ver. 2</option>
+				</select>
 				<h2><span class="u">Turn:</span> <span id="turn">White Player</span></h2>
+				<h2 id="endGame"></h2>
 				<div class="u">White Score: <span id="whiteScore"></span></div>
 				<div class="u">Black Score: <span id="blackScore"></span></div>
+				<br/>
+				<button id="reset">Reset</button>
 			</div>
 				
 			<div id=board>
