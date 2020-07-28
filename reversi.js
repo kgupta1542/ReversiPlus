@@ -58,7 +58,7 @@ highlightColorSelect.addEventListener('change', updateHighlightColor, false);
 
 function updateHighlightColor(){
 	highlightColor = highlightColorSelect.value;
-	setCookie("hightlightColor",highlightColor);
+	setCookie("highlightColor",highlightColor);
 	indicatePotentialMoves();
 }
 
@@ -82,13 +82,8 @@ function updateButtonColor(){
 }
 
 function initColorSet(){
-	boardColorSelect.value = "#2eae52";
-	highlightColorSelect.value = "#4eee92";
-	panelColorSelect.value = "#2eae52";
-	buttonColorSelect.value = "#4eee92";
-	
 	var allCookies = document.cookie;
-    var cookieArray = allCookies.split(';');
+   	var cookieArray = allCookies.split(';');
 	for(var i = 0; i < cookieArray.length; i++){
 		switch(cookieArray[i].split('=')[0]){
 			case "boardColor":
