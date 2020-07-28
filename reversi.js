@@ -24,26 +24,17 @@ var panelColorSelect = document.getElementById("panelColor");
 var panelColor = panelColorSelect.value;
 var buttonColorSelect = document.getElementById("buttonColor");
 var buttonColor = buttonColorSelect.value;
+var defaultColor = document.getElementById("defaultColor");
 var noMoveTurns = 0;
 
 //Color Controls===================================================================
 function hexToRGB(h) {
-  let r = 0, g = 0, b = 0;
-
-  // 3 digits
-  if (h.length == 4) {
-    r = "0x" + h[1] + h[1];
-    g = "0x" + h[2] + h[2];
-    b = "0x" + h[3] + h[3];
-
-  // 6 digits
-  } else if (h.length == 7) {
-    r = "0x" + h[1] + h[2];
-    g = "0x" + h[3] + h[4];
-    b = "0x" + h[5] + h[6];
-  }
+	let r = 0, g = 0, b = 0;
+	r = "0x" + h[1] + h[2];
+	g = "0x" + h[3] + h[4];
+	b = "0x" + h[5] + h[6];
   
-  return "rgb("+ +r + ", " + +g + ", " + +b + ")";
+	return "rgb("+ +r + ", " + +g + ", " + +b + ")";
 }
 
 function setCookie(cname,cvalue){
@@ -53,10 +44,8 @@ function setCookie(cname,cvalue){
 boardColorSelect.addEventListener('change', updateBoardColor, false);
 
 function updateBoardColor(){
-	prevBoardColor = boardColor;
 	boardColor = boardColorSelect.value;
 	setCookie("boardColor",boardColor);
-	console.log("Color changing to: " + boardColor + " from " + prevBoardColor);
 	
 	for(var i = 0; i < 8; i++){
 		for(var j = 0; j < 8; j++){
@@ -70,7 +59,7 @@ highlightColorSelect.addEventListener('change', updateHighlightColor, false);
 
 function updateHighlightColor(){
 	highlightColor = highlightColorSelect.value;
-	setCookie("hightlightColor",highlightColor);
+	setCookie("highlightColor",highlightColor);
 	indicatePotentialMoves();
 }
 
@@ -92,6 +81,46 @@ function updateButtonColor(){
 	oppPlayerType.style.backgroundColor = buttonColor;
 	oppPlayerLevel.style.backgroundColor = buttonColor;
 }
+
+defaultColor.addEventListener('mousedown', setDefaultColors, false);
+
+function setDefaultColors(){
+	boardColorSelect.value = "#2eae52";
+	highlightColorSelect.value = "#4eee92";
+	panelColorSelect.value = "#2eae52";
+	buttonColorSelect.value = "#4eee92";
+	
+	updateBoardColor();
+	updateHighlightColor();
+	updatePanelColor();
+	updateButtonColor();
+}
+
+function initColorSet(){
+	var allCookies = document.cookie;
+   	var cookieArray = allCookies.split(';');
+	for(var i = 0; i < cookieArray.length; i++){
+		currCookie = cookieArray[i].split('=')[0].replace(/ /g,'');
+		if(currCookie == "boardColor"){
+			boardColorSelect.value = cookieArray[i].split('=')[1];
+		}
+		else if(currCookie == "highlightColor"){
+			highlightColorSelect.value = cookieArray[i].split('=')[1];
+		}
+		else if(currCookie == "panelColor"){
+			panelColorSelect.value = cookieArray[i].split('=')[1];
+		}
+		else if(currCookie == "buttonColor"){
+			buttonColorSelect.value = cookieArray[i].split('=')[1];
+		}
+	}
+	
+	updateBoardColor();
+	updateHighlightColor();
+	updatePanelColor();
+	updateButtonColor();
+}
+
 //UI Controls========================================================================================
 function toggleTurn(){//Changes turn on UI
 	turn.innerHTML = (turn.innerHTML == "White Player") ? "Black Player" : "White Player";
@@ -518,6 +547,7 @@ function aiTurn(){
 //gameTurn ==================================================================================================
 function initGame(){//Create beginning 4 pieces on board
 	turn.innerHTML = "White Player";
+	initColorSet();
 	
 	createGamePiece(3,3,"W");
 	createGamePiece(3,4,"B");
@@ -530,7 +560,6 @@ function initGame(){//Create beginning 4 pieces on board
 function addPiece(tar){
 	var type = (turn.innerHTML == "White Player") ? "W" : "B";
 	
-	console.log(tar.target.style.backgroundColor);
 	if (tar.target.classList[0] === 'unit' && tar.target.style.backgroundColor == hexToRGB(highlightColor)) {
 		var selectedRow = parseInt(tar.target.parentElement.id.substring(4));
 		var selectedCol = parseInt(tar.target.classList[1].substring(4));
