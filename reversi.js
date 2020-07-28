@@ -41,6 +41,7 @@ function resetBoard(){
 	blackPieces = [];
 	
 	clearPotentialMoves();
+	moves = 0;
 	initGame();
 	turn.parentElement.style.display = "block";
 	endGameLabel.style.display = "none";
