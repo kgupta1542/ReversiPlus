@@ -12,6 +12,7 @@ var moves = 4;//Number of pieces on board
 var turn = document.getElementById("turn");//Turn DOM Element
 var mode = document.getElementById("gameMode");
 var reset = document.getElementById("reset");
+var noMoveTurns = 0;
 
 //UI Controls========================================================================================
 function toggleTurn(){//Changes turn on UI
@@ -449,12 +450,21 @@ function gamePlay(type){
 	}
 	
 	if(allPotentialMoves.length > 0){
+		noMoveTurns = 0;
 		indicatePotentialMoves();
 	}
 	else{//If there are no potential moves, skip turn
-		toggleTurn();
-		gamePlay(oppType);
-		console.log("There are no moves. Giving turn to player: " + oppType);
+		noMoveTurns++;
+		
+		if(noMoveTurns >= 2){//If neither player has a move, end the game
+			endGame();
+		}
+		else{
+			alert("No Available Moves. " + turn.innerHTML + " Turn Skipped!")
+			toggleTurn();
+			gamePlay(oppType);
+			console.log("There are no moves. Giving turn to player: " + oppType);
+		}
 	}
 	
 	board.addEventListener('mousedown', addPiece, false);
