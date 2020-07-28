@@ -12,19 +12,20 @@ var moves = 4;//Number of pieces on board
 var turn = document.getElementById("turn");//Turn DOM Element
 var mode = document.getElementById("gameMode");
 var reset = document.getElementById("reset");
+var endGameLabel = document.getElementById("endGame");
+var oppPlayerType = document.getElementById("oppPlayerType");
+var oppPlayerLevel = document.getElementById("oppPlayerLevel");
 var noMoveTurns = 0;
 
 //UI Controls========================================================================================
 function toggleTurn(){//Changes turn on UI
-	var text = (turn.innerHTML == "White Player") ? "Black Player" : "White Player";
-	turn.innerHTML = text;
+	turn.innerHTML = (turn.innerHTML == "White Player") ? "Black Player" : "White Player";
 }
 
 mode.addEventListener('mousedown', toggleMode, false);
 
 function toggleMode(){
-	var text = (mode.innerHTML == "Plus Mode") ? "Classic" : "Plus Mode";
-	mode.innerHTML = text;
+	mode.innerHTML = (mode.innerHTML == "Plus Mode") ? "Classic" : "Plus Mode";
 }
 
 reset.addEventListener('mousedown', resetBoard, false);
@@ -41,7 +42,18 @@ function resetBoard(){
 	
 	clearPotentialMoves();
 	initGame();
-	gamePlay("W");
+	turn.parentElement.style.display = "block";
+	endGameLabel.style.display = "none";
+	
+	gameTurn("W");
+}
+
+oppPlayerType.addEventListener('mousedown', toggleOppPlayerType, false);
+
+function toggleOppPlayerType(){
+	oppPlayerType.innerHTML = (oppPlayerType.innerHTML == "vs Human") ? "vs AI" : "vs Human";
+	oppPlayerType.parentElement.style.width = (oppPlayerType.innerHTML == "vs Human") ? "275px" : "390px";
+	oppPlayerLevel.style.display = (oppPlayerType.innerHTML == "vs Human") ? "none" : "inline";
 }
 
 function updateScore(){//Updates score on UI
@@ -392,7 +404,42 @@ function findFlipPlusPieces(type){
 	}
 }
 
-//Gameplay ==================================================================================================
+//AI Player Functionality
+function aiTurn(){
+	var type = (turn.innerHTML == "White Player") ? "W" : "B";
+	var maxScoreIndex = [0,0];
+	var maxScore = 0;
+	var currScore;
+	var currFlippablePieces;
+	
+	for(var i = 0; i < allPotentialMoves.length; i++){
+		for(var j = 0; j < allPotentialMoves[i].length; j++){
+			currFlippablePieces = findFlippablePieces(allPotentialMoves[i][j][0],allPotentialMoves[i][j][1]);
+			
+			if(mode.innerHTML == "Classic" || parseInt(oppPlayerLevel.value) == 1){
+				currScore = currFlippablePieces.length;
+			}
+			else if(parseInt(oppPlayerLevel.value) == 2){
+				currScore = currFlippablePieces.length;
+				for(var k = 0; k < currFlippablePieces.length; k++){
+					currScore += findFlippablePieces(currFlippablePieces[k][0],currFlippablePieces[k][1]).length;
+				}
+			}
+			
+			console.log("Score for (" + allPotentialMoves[i][j][0] + "," + allPotentialMoves[i][j][1] + ") is: " + currScore);
+			if(currScore > maxScore){
+				maxScore = currScore;
+				maxScoreIndex[0] = i;
+				maxScoreIndex[1] = j;
+			}
+		}
+	}
+	
+	console.log("Chosen move is: (" + allPotentialMoves[maxScoreIndex[0]][maxScoreIndex[1]][0] + "," + allPotentialMoves[maxScoreIndex[0]][maxScoreIndex[1]][1] + ")");
+	gamePlay(allPotentialMoves[maxScoreIndex[0]][maxScoreIndex[1]][0],allPotentialMoves[maxScoreIndex[0]][maxScoreIndex[1]][1],type);
+}
+
+//gameTurn ==================================================================================================
 function initGame(){//Create beginning 4 pieces on board
 	turn.innerHTML = "White Player";
 	
@@ -406,36 +453,40 @@ function initGame(){//Create beginning 4 pieces on board
 
 function addPiece(tar){
 	var type = (turn.innerHTML == "White Player") ? "W" : "B";
-	var oppType = (type == "W") ? "B" : "W";
 	
 	if (tar.target.classList[0] === 'unit' && tar.target.style.backgroundColor == "rgb(78, 238, 146)") {
-    	var selectedRow = parseInt(tar.target.parentElement.id.substring(4));
+		var selectedRow = parseInt(tar.target.parentElement.id.substring(4));
 		var selectedCol = parseInt(tar.target.classList[1].substring(4));
-		createGamePiece(selectedRow, selectedCol, type);
-		board.removeEventListener("mousedown", addPiece);
-		findFlippablePieces(selectedRow, selectedCol);
-		flipPieces(flippablePieces, type);
-		
-		if(mode.innerHTML == "Plus Mode"){
-			findFlipPlusPieces(type);
-			flipPieces(flipPlusPieces,type);
-		}
-		
-		moves += 1;
-		clearPotentialMoves();
-		console.log(whitePieces.length + blackPieces.length == moves);
-		
-		if(moves < 64 && blackPieces.length > 0 && whitePieces.length > 0){
-			toggleTurn();
-			gamePlay(oppType);
-		}
-		else{
-			endGame();
-		}
+		gamePlay(selectedRow, selectedCol, type);
     }
 }
 
-function gamePlay(type){
+function gamePlay(row, col, type){
+	var oppType = (type == "W") ? "B" : "W";
+	
+	createGamePiece(row, col, type);
+	board.removeEventListener("mousedown", addPiece);
+	findFlippablePieces(row, col);
+	flipPieces(flippablePieces, type);
+	
+	if(mode.innerHTML == "Plus Mode"){
+		findFlipPlusPieces(type);
+		flipPieces(flipPlusPieces,type);
+	}
+	
+	moves += 1;
+	clearPotentialMoves();
+	
+	if(moves < 64 && blackPieces.length > 0 && whitePieces.length > 0){
+		toggleTurn();
+		gameTurn(oppType);
+	}
+	else{
+		endGame();
+	}
+}
+
+function gameTurn(type){
 	var searchArr = (turn.innerHTML == "White Player") ? whitePieces : blackPieces;
 	var oppType = (turn.innerHTML == "White Player") ? "B" : "W";
 	
@@ -460,24 +511,27 @@ function gamePlay(type){
 			endGame();
 		}
 		else{
-			alert("No Available Moves. " + turn.innerHTML + " Turn Skipped!")
+			alert("No Available Moves. " + turn.innerHTML + " Turn Skipped!");
 			toggleTurn();
-			gamePlay(oppType);
-			console.log("There are no moves. Giving turn to player: " + oppType);
+			gameTurn(oppType);
 		}
 	}
 	
-	board.addEventListener('mousedown', addPiece, false);
+	if(type == "B" && oppPlayerType.innerHTML == "vs AI"){
+		aiTurn();
+	}
+	else{
+		board.addEventListener('mousedown', addPiece, false);
+	}
 }
 
 function endGame(){
-	if(blackPieces.length > whitePieces.length){
-		turn.parentElement.innerText = "Black Player Wins!";
-	}
-	else{
-		turn.parentElement.innerText = "White Player Wins!";
-	}
+	endGameLabel.style.display = "block";
+	turn.parentElement.style.display = "none";
+	
+	var text = (blackPieces.length > whitePieces.length) ? "Black Player Wins!" : "White Player Wins!";
+	endGameLabel.innerText = text;
 }
 
 initGame();
-gamePlay("W");
+gameTurn("W");
