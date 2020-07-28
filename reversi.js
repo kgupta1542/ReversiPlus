@@ -12,11 +12,86 @@ var moves = 4;//Number of pieces on board
 var turn = document.getElementById("turn");//Turn DOM Element
 var mode = document.getElementById("gameMode");
 var reset = document.getElementById("reset");
+var panel = document.getElementById("ui");
 var endGameLabel = document.getElementById("endGame");
 var oppPlayerType = document.getElementById("oppPlayerType");
 var oppPlayerLevel = document.getElementById("oppPlayerLevel");
+var boardColorSelect = document.getElementById("boardColor");
+var boardColor = boardColorSelect.value;
+var highlightColorSelect = document.getElementById("highlightColor");
+var highlightColor = highlightColorSelect.value;
+var panelColorSelect = document.getElementById("panelColor");
+var panelColor = panelColorSelect.value;
+var buttonColorSelect = document.getElementById("buttonColor");
+var buttonColor = buttonColorSelect.value;
 var noMoveTurns = 0;
 
+//Color Controls===================================================================
+function hexToRGB(h) {
+  let r = 0, g = 0, b = 0;
+
+  // 3 digits
+  if (h.length == 4) {
+    r = "0x" + h[1] + h[1];
+    g = "0x" + h[2] + h[2];
+    b = "0x" + h[3] + h[3];
+
+  // 6 digits
+  } else if (h.length == 7) {
+    r = "0x" + h[1] + h[2];
+    g = "0x" + h[3] + h[4];
+    b = "0x" + h[5] + h[6];
+  }
+  
+  return "rgb("+ +r + ", " + +g + ", " + +b + ")";
+}
+
+function setCookie(cname,cvalue){
+    document.cookie = cname + "=" + cvalue;
+}
+
+boardColorSelect.addEventListener('change', updateBoardColor, false);
+
+function updateBoardColor(){
+	prevBoardColor = boardColor;
+	boardColor = boardColorSelect.value;
+	setCookie("boardColor",boardColor);
+	console.log("Color changing to: " + boardColor + " from " + prevBoardColor);
+	
+	for(var i = 0; i < 8; i++){
+		for(var j = 0; j < 8; j++){
+			getUnit(i,j).style.backgroundColor = boardColor;
+		}
+	}
+	indicatePotentialMoves();
+}
+
+highlightColorSelect.addEventListener('change', updateHighlightColor, false);
+
+function updateHighlightColor(){
+	highlightColor = highlightColorSelect.value;
+	setCookie("hightlightColor",highlightColor);
+	indicatePotentialMoves();
+}
+
+panelColorSelect.addEventListener('change', updatePanelColor, false);
+
+function updatePanelColor(){
+	panelColor = panelColorSelect.value;
+	setCookie("panelColor",panelColor);
+	panel.style.backgroundColor = panelColor;
+}
+
+buttonColorSelect.addEventListener('change', updateButtonColor, false);
+
+function updateButtonColor(){
+	buttonColor = buttonColorSelect.value;
+	setCookie("buttonColor",buttonColor);
+	mode.style.backgroundColor = buttonColor;
+	reset.style.backgroundColor = buttonColor;
+	oppPlayerType.style.backgroundColor = buttonColor;
+	oppPlayerLevel.style.backgroundColor = buttonColor;
+}
 //UI Controls========================================================================================
 function toggleTurn(){//Changes turn on UI
 	turn.innerHTML = (turn.innerHTML == "White Player") ? "Black Player" : "White Player";
@@ -115,7 +190,7 @@ function createGamePieceElement(type){//Create specificied game piece
 function createGamePiece(row, col, type){//Loads game piece in specified unit
 	removeGamePiece(row,col,type);//Clears cell
 	getUnit(row,col).appendChild(createGamePieceElement(type));//Loads game piece
-	getUnit(row,col).style.backgroundColor == "#2eae52";//Removes highlight
+	getUnit(row,col).style.backgroundColor == boardColor;//Removes highlight
 	
 	var searchArr = (type == "W") ? whitePieces : blackPieces;
 	var exists = false;
@@ -252,7 +327,7 @@ function findPotentialMoves(row, col){//Search algorithm to identify all possibl
 function indicatePotentialMoves(){//Highlight all potential moves
 	for(var i = 0; i < allPotentialMoves.length; i++){
 		for(var j = 0; j < allPotentialMoves[i].length; j++){
-			getUnit(allPotentialMoves[i][j][0],allPotentialMoves[i][j][1]).style.backgroundColor = "#4eee92";
+			getUnit(allPotentialMoves[i][j][0],allPotentialMoves[i][j][1]).style.backgroundColor = highlightColor;
 		}
 	}
 }
@@ -260,7 +335,7 @@ function indicatePotentialMoves(){//Highlight all potential moves
 function clearPotentialMoves(){//Reset all highlighted potential moves
 	for(var i = 0; i < allPotentialMoves.length; i++){
 		for(var j = 0; j < allPotentialMoves[i].length; j++){
-			getUnit(allPotentialMoves[i][j][0],allPotentialMoves[i][j][1]).style.backgroundColor = "#2eae52";
+			getUnit(allPotentialMoves[i][j][0],allPotentialMoves[i][j][1]).style.backgroundColor = boardColor;
 		}
 	}
 }
@@ -455,7 +530,8 @@ function initGame(){//Create beginning 4 pieces on board
 function addPiece(tar){
 	var type = (turn.innerHTML == "White Player") ? "W" : "B";
 	
-	if (tar.target.classList[0] === 'unit' && tar.target.style.backgroundColor == "rgb(78, 238, 146)") {
+	console.log(tar.target.style.backgroundColor);
+	if (tar.target.classList[0] === 'unit' && tar.target.style.backgroundColor == hexToRGB(highlightColor)) {
 		var selectedRow = parseInt(tar.target.parentElement.id.substring(4));
 		var selectedCol = parseInt(tar.target.classList[1].substring(4));
 		gamePlay(selectedRow, selectedCol, type);
