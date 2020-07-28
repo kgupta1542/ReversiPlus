@@ -24,6 +24,7 @@ var panelColorSelect = document.getElementById("panelColor");
 var panelColor = panelColorSelect.value;
 var buttonColorSelect = document.getElementById("buttonColor");
 var buttonColor = buttonColorSelect.value;
+var defaultColor = document.getElementById("defaultColor");
 var noMoveTurns = 0;
 
 //Color Controls===================================================================
@@ -79,6 +80,20 @@ function updateButtonColor(){
 	reset.style.backgroundColor = buttonColor;
 	oppPlayerType.style.backgroundColor = buttonColor;
 	oppPlayerLevel.style.backgroundColor = buttonColor;
+}
+
+defaultColor.addEventListener('mousedown', setDefaultColors, false);
+
+function setDefaultColors(){
+	boardColorSelect.value = "#2eae52";
+	highlightColorSelect.value = "#4eee92";
+	panelColorSelect.value = "#2eae52";
+	buttonColorSelect.value = "#4eee92";
+	
+	updateBoardColor();
+	updateHighlightColor();
+	updatePanelColor();
+	updateButtonColor();
 }
 
 function initColorSet(){
@@ -545,7 +560,6 @@ function initGame(){//Create beginning 4 pieces on board
 function addPiece(tar){
 	var type = (turn.innerHTML == "White Player") ? "W" : "B";
 	
-	console.log(tar.target.style.backgroundColor);
 	if (tar.target.classList[0] === 'unit' && tar.target.style.backgroundColor == hexToRGB(highlightColor)) {
 		var selectedRow = parseInt(tar.target.parentElement.id.substring(4));
 		var selectedCol = parseInt(tar.target.classList[1].substring(4));
