@@ -103,11 +103,16 @@ function createGamePiece(row, col, type){//Loads game piece in specified unit
 	getUnit(row,col).appendChild(createGamePieceElement(type));//Loads game piece
 	getUnit(row,col).style.backgroundColor == "#2eae52";//Removes highlight
 	
-	if(type == "W"){//Adds cell to corresponding array
-		whitePieces.push([row, col]);
+	var searchArr = (type == "W") ? whitePieces : blackPieces;
+	var exists = false;
+	for(var i = 0; i < searchArr.length; i++){
+		if(JSON.stringify(searchArr[i]) == JSON.stringify([row,col])){
+			exists = true;
+		}
 	}
-	else{
-		blackPieces.push([row,col]);
+	
+	if(!exists){
+		searchArr.push([row,col]);
 	}
 }
 
@@ -416,8 +421,8 @@ function addPiece(tar){
 		}
 		
 		moves += 1;
-		
 		clearPotentialMoves();
+		console.log(whitePieces.length + blackPieces.length == moves);
 		
 		if(moves < 64 && blackPieces.length > 0 && whitePieces.length > 0){
 			toggleTurn();
