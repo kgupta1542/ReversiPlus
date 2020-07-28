@@ -519,7 +519,7 @@ function gameTurn(type){
 	}
 	
 	if(type == "B" && oppPlayerType.innerHTML == "vs AI"){
-		aiTurn();
+		setTimeout(aiTurn(),2500);
 	}
 	else{
 		board.addEventListener('mousedown', addPiece, false);
