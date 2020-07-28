@@ -28,22 +28,12 @@ var noMoveTurns = 0;
 
 //Color Controls===================================================================
 function hexToRGB(h) {
-  let r = 0, g = 0, b = 0;
-
-  // 3 digits
-  if (h.length == 4) {
-    r = "0x" + h[1] + h[1];
-    g = "0x" + h[2] + h[2];
-    b = "0x" + h[3] + h[3];
-
-  // 6 digits
-  } else if (h.length == 7) {
-    r = "0x" + h[1] + h[2];
-    g = "0x" + h[3] + h[4];
-    b = "0x" + h[5] + h[6];
-  }
+	let r = 0, g = 0, b = 0;
+	r = "0x" + h[1] + h[2];
+	g = "0x" + h[3] + h[4];
+	b = "0x" + h[5] + h[6];
   
-  return "rgb("+ +r + ", " + +g + ", " + +b + ")";
+	return "rgb("+ +r + ", " + +g + ", " + +b + ")";
 }
 
 function setCookie(cname,cvalue){
@@ -53,10 +43,8 @@ function setCookie(cname,cvalue){
 boardColorSelect.addEventListener('change', updateBoardColor, false);
 
 function updateBoardColor(){
-	prevBoardColor = boardColor;
 	boardColor = boardColorSelect.value;
 	setCookie("boardColor",boardColor);
-	console.log("Color changing to: " + boardColor + " from " + prevBoardColor);
 	
 	for(var i = 0; i < 8; i++){
 		for(var j = 0; j < 8; j++){
@@ -92,6 +80,38 @@ function updateButtonColor(){
 	oppPlayerType.style.backgroundColor = buttonColor;
 	oppPlayerLevel.style.backgroundColor = buttonColor;
 }
+
+function initColorSet(){
+	boardColorSelect.value = "#2eae52";
+	highlightColorSelect.value = "#4eee92";
+	panelColorSelect.value = "#2eae52";
+	buttonColorSelect.value = "#4eee92";
+	
+	var allCookies = document.cookie;
+    var cookieArray = allCookies.split(';');
+	for(var i = 0; i < cookieArray.length; i++){
+		switch(cookieArray[i].split('=')[0]){
+			case "boardColor":
+				boardColorSelect.value = cookieArray[i].split('=')[1];
+				break;
+			case "highlightColor":
+				highlightColorSelect.value = cookieArray[i].split('=')[1];
+				break;
+			case "panelColor":
+				panelColorSelect.value = cookieArray[i].split('=')[1];
+				break;
+			case "buttonColor":
+				buttonColorSelect.value = cookieArray[i].split('=')[1];
+				break;
+		}
+	}
+	
+	updateBoardColor();
+	updateHighlightColor();
+	updatePanelColor();
+	updateButtonColor();
+}
+
 //UI Controls========================================================================================
 function toggleTurn(){//Changes turn on UI
 	turn.innerHTML = (turn.innerHTML == "White Player") ? "Black Player" : "White Player";
@@ -518,6 +538,7 @@ function aiTurn(){
 //gameTurn ==================================================================================================
 function initGame(){//Create beginning 4 pieces on board
 	turn.innerHTML = "White Player";
+	initColorSet();
 	
 	createGamePiece(3,3,"W");
 	createGamePiece(3,4,"B");
