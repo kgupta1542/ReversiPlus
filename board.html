@@ -12,7 +12,6 @@
 			    display: inline-block;
 			    vertical-align: top;
 			    margin-right: 20px;
-			    /* outline: solid black; */
 			    background-color: #2eae52;
 			    padding-left: 15px;
 			    padding-bottom: 10px;
@@ -39,7 +38,7 @@
 				height:50px;
 				width:50px;
 			    box-shadow: 0px 0 6px 4px black;
-				background-color:#2eae52
+				background-color:#2eae52;
 			}
 			.u{
 				font-size: 1.3em;
@@ -47,6 +46,9 @@
 			}
 			#player{
 				font-family:monospace;
+				z-index:998;
+			}
+			body{
 				text-align:center;
 			}
 			#title{
@@ -82,6 +84,30 @@
 			    margin-right: 5px;
 			    font-family: monospace;
 			    font-weight: bolder;
+			}
+			#settingsPanel{
+				z-index:999;
+				text-align: initial;
+			    display: inline-block;
+			    background-color: #2eae52;
+			    vertical-align: top;
+			    margin-top: 25px;
+			    color: white;
+			    border-radius: 15px;
+			    box-shadow: 0px 0px 0px 4px black;
+			    font-family:monospace;
+			}
+			.colorPicker{
+				display:inline-block;
+				padding: 5px 10px 5px 10px;
+				vertical-align:baseline;
+			}
+			.colorPicker > label{
+				vertical-align:baseline;
+			}
+			.colorPicker > input{
+				border-radius: 10px;
+    			vertical-align: middle;			
 			}
 		</style>
 	</head>
@@ -202,6 +228,27 @@
 					<div class="unit col_7" style="border-bottom-right-radius: 15px;"></div>
 					<div class="num-label label">8</div>
 				</div>
+			</div>
+		</div>
+		
+		<div id="settingsPanel">
+			<div>
+				<div class="colorPicker">
+					<label for="boardColor">Board Color:</label>
+  					<input type="color" id="boardColor" value="#2eae52"><br>
+ 				</div>
+ 				<div class="colorPicker">
+					<label for="highlightColor">Highlight Color:</label>
+  					<input type="color" id="highlightColor" value="#4eee92"><br>
+ 				</div>
+ 				<div class="colorPicker">
+					<label for="panelColor">Panel Color:</label>
+  					<input type="color" id="panelColor" value="#2eae52"><br>
+ 				</div>
+ 				<div class="colorPicker">
+					<label for="buttonColor">button Color:</label>
+  					<input type="color" id="buttonColor" value="#4eee92"><br>
+ 				</div>
 			</div>
 		</div>
 	</body>
