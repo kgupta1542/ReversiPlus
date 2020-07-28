@@ -17,6 +17,14 @@ var oppPlayerType = document.getElementById("oppPlayerType");
 var oppPlayerLevel = document.getElementById("oppPlayerLevel");
 var noMoveTurns = 0;
 
+function sleep(milliseconds) {
+  const date = Date.now();
+  let currentDate = null;
+  do {
+    currentDate = Date.now();
+  } while (currentDate - date < milliseconds);
+}
+
 //UI Controls========================================================================================
 function toggleTurn(){//Changes turn on UI
 	turn.innerHTML = (turn.innerHTML == "White Player") ? "Black Player" : "White Player";
@@ -519,7 +527,8 @@ function gameTurn(type){
 	}
 	
 	if(type == "B" && oppPlayerType.innerHTML == "vs AI"){
-		setTimeout(aiTurn(),2500);
+		sleep(2500);
+		aiTurn();
 	}
 	else{
 		board.addEventListener('mousedown', addPiece, false);
