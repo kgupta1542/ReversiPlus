@@ -85,19 +85,18 @@ function initColorSet(){
 	var allCookies = document.cookie;
    	var cookieArray = allCookies.split(';');
 	for(var i = 0; i < cookieArray.length; i++){
-		switch(cookieArray[i].split('=')[0].replace(/ /g,'')){
-			case "boardColor":
-				boardColorSelect.value = cookieArray[i].split('=')[1];
-				break;
-			case "highlightColor":
-				highlightColorSelect.value = cookieArray[i].split('=')[1];
-				break;
-			case "panelColor":
-				panelColorSelect.value = cookieArray[i].split('=')[1];
-				break;
-			case "buttonColor":
-				buttonColorSelect.value = cookieArray[i].split('=')[1];
-				break;
+		currCookie = cookieArray[i].split('=')[0].replace(/ /g,'');
+		if(currCookie == "boardColor"){
+			boardColorSelect.value = cookieArray[i].split('=')[1];
+		}
+		else if(currCookie == "highlightColor"){
+			highlightColorSelect.value = cookieArray[i].split('=')[1];
+		}
+		else if(currCookie == "panelColor"){
+			panelColorSelect.value = cookieArray[i].split('=')[1];
+		}
+		else if(currCookie == "buttonColor"){
+			buttonColorSelect.value = cookieArray[i].split('=')[1];
 		}
 	}
 	
