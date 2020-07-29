@@ -371,8 +371,7 @@ function clearPotentialMoves(){//Reset all highlighted potential moves
 }
 
 //Flip Pieces (including Flip Plus)============================================================================
-function findFlippablePieces(row, col){//Search algorithm to identify all possible move locations
-	var type = getType(row, col);
+function findFlippablePieces(row, col, type){//Search algorithm to identify all possible move locations
 	var oppType = (type == "W") ? "B" : "W";
 	
 	flippablePieces = [];
@@ -505,34 +504,65 @@ function findFlipPlusPieces(type){
 	flipPlusPieces = [];
 	
 	for(var i = 0; i < flippablePiecesCopy.length; i++){
-		findFlippablePieces(flippablePiecesCopy[i][0],flippablePiecesCopy[i][1]);
+		findFlippablePieces(flippablePiecesCopy[i][0],flippablePiecesCopy[i][1],type);
 		flipPlusPieces = flipPlusPieces.concat(flippablePieces);
 	}
 }
 
 //AI Player Functionality
 function aiTurn(){
-	var type = (turn.innerHTML == "White Player") ? "W" : "B";
+	var type = "B";
+	var level = parseInt(oppPlayerLevel.value);
 	var maxScoreIndex = [0,0];
 	var maxScore = 0;
 	var currScore;
 	var currFlippablePieces;
+	var tempPlusPieces = [];
+	var currPlusPieces = [];
 	
 	for(var i = 0; i < allPotentialMoves.length; i++){
 		for(var j = 0; j < allPotentialMoves[i].length; j++){
-			currFlippablePieces = findFlippablePieces(allPotentialMoves[i][j][0],allPotentialMoves[i][j][1]);
+			currFlippablePieces = findFlippablePieces(allPotentialMoves[i][j][0],allPotentialMoves[i][j][1],type);
 			
-			if(mode.innerHTML == "Classic" || parseInt(oppPlayerLevel.value) == 1){
+			if(level == 1){
 				currScore = currFlippablePieces.length;
 			}
-			else if(parseInt(oppPlayerLevel.value) == 2){
+			else if(level == 2){
+				if((allPotentialMoves[i][j][0] <= 1 || allPotentialMoves[i][j][0] >= 6) && (allPotentialMoves[i][j][1] <= 1 || allPotentialMoves[i][j][1] >= 6)){
+					if((allPotentialMoves[i][j][0] + allPotentialMoves[i][j][1]) % 7 == 0){
+						console.log("Corner at: " + String.fromCharCode(65 +allPotentialMoves[i][j][1]) + (1+allPotentialMoves[i][j][0]));
+						currScore += 3;
+					}
+					else{
+						console.log("Danger at: " + String.fromCharCode(65 +allPotentialMoves[i][j][1]) + (1+allPotentialMoves[i][j][0]));
+						currScore -= 5;
+					}
+				}
+			}
+			else if(level >= 3){
 				currScore = currFlippablePieces.length;
+				tempPlusPieces = [];
 				for(var k = 0; k < currFlippablePieces.length; k++){
-					currScore += findFlippablePieces(currFlippablePieces[k][0],currFlippablePieces[k][1]).length;
+					tempPlusPieces.concat(findFlippablePieces(currFlippablePieces[k][0],currFlippablePieces[k][1],type));
+				}
+				
+				currScore += currPlusPieces.length;
+				
+				if(level == 4){
+					if((allPotentialMoves[i][j][0] <= 1 || allPotentialMoves[i][j][0] >= 6) && (allPotentialMoves[i][j][1] <= 1 || allPotentialMoves[i][j][1] >= 6)){
+						if((allPotentialMoves[i][j][0] + allPotentialMoves[i][j][1]) % 7 == 0){
+							console.log("Corner at: " + String.fromCharCode(65 +allPotentialMoves[i][j][1]) + (1+allPotentialMoves[i][j][0]));
+							currScore += 3;
+						}
+						else{
+							console.log("Danger at: " + String.fromCharCode(65 +allPotentialMoves[i][j][1]) + (1+allPotentialMoves[i][j][0]));
+							currScore -= 5;
+						}
+					}
 				}
 			}
 			
-			console.log("Score for (" + allPotentialMoves[i][j][0] + "," + allPotentialMoves[i][j][1] + ") is: " + currScore);
+			//console.log("Score for " + String.fromCharCode(65 +allPotentialMoves[i][j][1]) + (1+allPotentialMoves[i][j][0]) + " is: " + currScore);
 			if(currScore > maxScore){
 				maxScore = currScore;
 				maxScoreIndex[0] = i;
@@ -541,7 +571,7 @@ function aiTurn(){
 		}
 	}
 	
-	console.log("Chosen move is: (" + allPotentialMoves[maxScoreIndex[0]][maxScoreIndex[1]][0] + "," + allPotentialMoves[maxScoreIndex[0]][maxScoreIndex[1]][1] + ")");
+	console.log("Chosen move is: " + String.fromCharCode(65 +allPotentialMoves[maxScoreIndex[0]][maxScoreIndex[1]][1]) + (1+allPotentialMoves[maxScoreIndex[0]][maxScoreIndex[1]][0]));
 	gamePlay(allPotentialMoves[maxScoreIndex[0]][maxScoreIndex[1]][0],allPotentialMoves[maxScoreIndex[0]][maxScoreIndex[1]][1],type);
 }
 
@@ -573,7 +603,7 @@ function gamePlay(row, col, type){
 	
 	createGamePiece(row, col, type);
 	board.removeEventListener("mousedown", addPiece);
-	findFlippablePieces(row, col);
+	findFlippablePieces(row, col, type);
 	flipPieces(flippablePieces, type);
 	
 	if(mode.innerHTML == "Plus Mode"){
