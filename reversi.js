@@ -138,13 +138,14 @@ function resetBoard(){
 	for(var i = 0; i < 8; i++){
 		for(var j = 0; j < 8; j++){
 			getUnit(i,j).innerHTML = "";
+			getUnit(i,j).style.backgroundColor = boardColor;
 		}
 	}
 	
 	whitePieces = [];
 	blackPieces = [];
 	
-	clearPotentialMoves();
+	allPotentialMoves = [];
 	moves = 0;
 	initGame();
 	turn.parentElement.style.display = "block";
