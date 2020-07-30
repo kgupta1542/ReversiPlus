@@ -148,6 +148,9 @@ function resetBoard(){
 	whitePieces = [];
 	blackPieces = [];
 	
+	aiTurnLabel.disabled = true;
+	aiTurnLabel.style.opacity = 0.5;
+	
 	allPotentialMoves = [];
 	moves = 0;
 	initGame();
