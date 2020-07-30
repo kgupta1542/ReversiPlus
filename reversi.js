@@ -25,6 +25,7 @@ var panelColor = panelColorSelect.value;
 var buttonColorSelect = document.getElementById("buttonColor");
 var buttonColor = buttonColorSelect.value;
 var defaultColor = document.getElementById("defaultColor");
+var aiTurnLabel = document.getElementById("aiTurn");
 var noMoveTurns = 0;
 
 //Color Controls===================================================================
@@ -124,6 +125,8 @@ function initColorSet(){
 //UI Controls========================================================================================
 function toggleTurn(){//Changes turn on UI
 	turn.innerHTML = (turn.innerHTML == "White Player") ? "Black Player" : "White Player";
+	aiTurnLabel.style.opacity = (turn.innerHTML == "White Player") ? 0.5 : 1;
+	aiTurnLabel.disabled = (aiTurnLabel.disabled) ? false : true;
 }
 
 mode.addEventListener('mousedown', toggleMode, false);
@@ -160,6 +163,7 @@ function toggleOppPlayerType(){
 	oppPlayerType.innerHTML = (oppPlayerType.innerHTML == "vs Human") ? "vs AI" : "vs Human";
 	oppPlayerType.parentElement.style.width = (oppPlayerType.innerHTML == "vs Human") ? "275px" : "390px";
 	oppPlayerLevel.style.display = (oppPlayerType.innerHTML == "vs Human") ? "none" : "inline";
+	aiTurnLabel.style.display = (oppPlayerType.innerHTML == "vs Human") ? "none" : "inline";
 }
 
 function updateScore(){//Updates score on UI
@@ -524,33 +528,11 @@ function aiTurn(){
 		for(var j = 0; j < allPotentialMoves[i].length; j++){
 			currFlippablePieces = findFlippablePieces(allPotentialMoves[i][j][0],allPotentialMoves[i][j][1],type);
 			
-			if(level == 1){
+			if(mode.innerHTML == "Classic"){
 				currScore = currFlippablePieces.length;
-			}
-			else if(level == 2){
-				if((allPotentialMoves[i][j][0] <= 1 || allPotentialMoves[i][j][0] >= 6) && (allPotentialMoves[i][j][1] <= 1 || allPotentialMoves[i][j][1] >= 6)){
-					if((allPotentialMoves[i][j][0] + allPotentialMoves[i][j][1]) % 7 == 0){
-						console.log("Corner at: " + String.fromCharCode(65 +allPotentialMoves[i][j][1]) + (1+allPotentialMoves[i][j][0]));
-						currScore += 3;
-					}
-					else{
-						console.log("Danger at: " + String.fromCharCode(65 +allPotentialMoves[i][j][1]) + (1+allPotentialMoves[i][j][0]));
-						currScore -= 5;
-					}
-				}
-			}
-			else if(level >= 3){
-				currScore = currFlippablePieces.length;
-				tempPlusPieces = [];
-				for(var k = 0; k < currFlippablePieces.length; k++){
-					tempPlusPieces.concat(findFlippablePieces(currFlippablePieces[k][0],currFlippablePieces[k][1],type));
-				}
-				
-				currScore += currPlusPieces.length;
-				
-				if(level == 4){
+				if(level == 2){
 					if((allPotentialMoves[i][j][0] <= 1 || allPotentialMoves[i][j][0] >= 6) && (allPotentialMoves[i][j][1] <= 1 || allPotentialMoves[i][j][1] >= 6)){
-						if((allPotentialMoves[i][j][0] + allPotentialMoves[i][j][1]) % 7 == 0){
+						if((allPotentialMoves[i][j][0] + allPotentialMoves[i][j][1]) % 7 == 0 && (allPotentialMoves[i][j][0] - allPotentialMoves[i][j][1]) % 7 == 0){
 							console.log("Corner at: " + String.fromCharCode(65 +allPotentialMoves[i][j][1]) + (1+allPotentialMoves[i][j][0]));
 							currScore += 3;
 						}
@@ -561,8 +543,30 @@ function aiTurn(){
 					}
 				}
 			}
+			else if(mode.innerHTML == "Plus Mode"){
+				currScore = currFlippablePieces.length;
+				tempPlusPieces = [];
+				for(var k = 0; k < currFlippablePieces.length; k++){
+					tempPlusPieces.concat(findFlippablePieces(currFlippablePieces[k][0],currFlippablePieces[k][1],type));
+				}
+				
+				currScore += currPlusPieces.length;
+				
+				if(level == 2){
+					if((allPotentialMoves[i][j][0] <= 1 || allPotentialMoves[i][j][0] >= 6) && (allPotentialMoves[i][j][1] <= 1 || allPotentialMoves[i][j][1] >= 6)){
+						if((allPotentialMoves[i][j][0] + allPotentialMoves[i][j][1]) % 7 == 0 && (allPotentialMoves[i][j][0] - allPotentialMoves[i][j][1]) % 7 == 0){
+							console.log("Corner at: " + String.fromCharCode(65 +allPotentialMoves[i][j][1]) + (1+allPotentialMoves[i][j][0]));
+							currScore += 7;
+						}
+						else{
+							console.log("Danger at: " + String.fromCharCode(65 +allPotentialMoves[i][j][1]) + (1+allPotentialMoves[i][j][0]));
+							currScore -= 7;
+						}
+					}
+				}
+			}
 			
-			//console.log("Score for " + String.fromCharCode(65 +allPotentialMoves[i][j][1]) + (1+allPotentialMoves[i][j][0]) + " is: " + currScore);
+			console.log("Score for " + String.fromCharCode(65 +allPotentialMoves[i][j][1]) + (1+allPotentialMoves[i][j][0]) + " is: " + currScore);
 			if(currScore > maxScore){
 				maxScore = currScore;
 				maxScoreIndex[0] = i;
@@ -601,8 +605,14 @@ function addPiece(tar){
 function gamePlay(row, col, type){
 	var oppType = (type == "W") ? "B" : "W";
 	
+	if(type == "W"){
+		board.removeEventListener("mousedown", addPiece);
+	}
+	else{
+		aiTurnLabel.removeEventListener("mousedown", aiTurn);
+	}
+	
 	createGamePiece(row, col, type);
-	board.removeEventListener("mousedown", addPiece);
 	findFlippablePieces(row, col, type);
 	flipPieces(flippablePieces, type);
 	
@@ -649,13 +659,17 @@ function gameTurn(type){
 		}
 		else{
 			alert("No Available Moves. " + turn.innerHTML + " Turn Skipped!");
+			clearPotentialMoves();
+			if(type == "W"){
+				board.removeEventListener("mousedown", addPiece);
+			}
 			toggleTurn();
 			gameTurn(oppType);
 		}
 	}
 	
 	if(type == "B" && oppPlayerType.innerHTML == "vs AI"){
-		aiTurn();
+		aiTurnLabel.addEventListener('mousedown', aiTurn, false);
 	}
 	else{
 		board.addEventListener('mousedown', addPiece, false);
