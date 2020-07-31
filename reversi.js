@@ -81,9 +81,10 @@ function updateButtonColor(){
 	reset.style.backgroundColor = buttonColor;
 	oppPlayerType.style.backgroundColor = buttonColor;
 	oppPlayerLevel.style.backgroundColor = buttonColor;
+	aiTurnLabel.style.backgroundColor = buttonColor;
 }
 
-defaultColor.addEventListener('mousedown', setDefaultColors, false);
+defaultColor.addEventListener('mouseup', setDefaultColors, false);
 
 function setDefaultColors(){
 	boardColorSelect.value = "#2eae52";
@@ -125,17 +126,17 @@ function initColorSet(){
 //UI Controls========================================================================================
 function toggleTurn(){//Changes turn on UI
 	turn.innerHTML = (turn.innerHTML == "White Player") ? "Black Player" : "White Player";
-	aiTurnLabel.style.opacity = (turn.innerHTML == "White Player") ? 0.5 : 1;
+	aiTurnLabel.style.opacity = (turn.innerHTML == "White Player") ? 1 : 0.5;
 	aiTurnLabel.disabled = (aiTurnLabel.disabled) ? false : true;
 }
 
-mode.addEventListener('mousedown', toggleMode, false);
+mode.addEventListener('mouseup', toggleMode, false);
 
 function toggleMode(){
 	mode.innerHTML = (mode.innerHTML == "Plus Mode") ? "Classic" : "Plus Mode";
 }
 
-reset.addEventListener('mousedown', resetBoard, false);
+reset.addEventListener('mouseup', resetBoard, false);
 
 function resetBoard(){
 	for(var i = 0; i < 8; i++){
@@ -152,15 +153,15 @@ function resetBoard(){
 	aiTurnLabel.style.opacity = 0.5;
 	
 	allPotentialMoves = [];
-	moves = 0;
+	moves = 4;
 	initGame();
 	turn.parentElement.style.display = "block";
 	endGameLabel.style.display = "none";
 	
-	gameTurn("W");
+	gameTurn("B");
 }
 
-oppPlayerType.addEventListener('mousedown', toggleOppPlayerType, false);
+oppPlayerType.addEventListener('mouseup', toggleOppPlayerType, false);
 
 function toggleOppPlayerType(){
 	oppPlayerType.innerHTML = (oppPlayerType.innerHTML == "vs Human") ? "vs AI" : "vs Human";
@@ -518,7 +519,7 @@ function findFlipPlusPieces(type){
 
 //AI Player Functionality
 function aiTurn(){
-	var type = "B";
+	var type = "W";
 	var level = parseInt(oppPlayerLevel.value);
 	var maxScoreIndex = [0,0];
 	var maxScore = 0;
@@ -537,11 +538,11 @@ function aiTurn(){
 					if((allPotentialMoves[i][j][0] <= 1 || allPotentialMoves[i][j][0] >= 6) && (allPotentialMoves[i][j][1] <= 1 || allPotentialMoves[i][j][1] >= 6)){
 						if((allPotentialMoves[i][j][0] + allPotentialMoves[i][j][1]) % 7 == 0 && (allPotentialMoves[i][j][0] - allPotentialMoves[i][j][1]) % 7 == 0){
 							console.log("Corner at: " + String.fromCharCode(65 +allPotentialMoves[i][j][1]) + (1+allPotentialMoves[i][j][0]));
-							currScore += 3;
+							currScore += 4.83;
 						}
 						else{
 							console.log("Danger at: " + String.fromCharCode(65 +allPotentialMoves[i][j][1]) + (1+allPotentialMoves[i][j][0]));
-							currScore -= 5;
+							currScore -= 2.85;
 						}
 					}
 				}
@@ -584,7 +585,7 @@ function aiTurn(){
 
 //gameTurn ==================================================================================================
 function initGame(){//Create beginning 4 pieces on board
-	turn.innerHTML = "White Player";
+	turn.innerHTML = "Black Player";
 	initColorSet();
 	
 	createGamePiece(3,3,"W");
@@ -608,11 +609,11 @@ function addPiece(tar){
 function gamePlay(row, col, type){
 	var oppType = (type == "W") ? "B" : "W";
 	
-	if(type == "W"){
-		board.removeEventListener("mousedown", addPiece);
+	if(type == "B"){
+		board.removeEventListener("mouseup", addPiece);
 	}
 	else{
-		aiTurnLabel.removeEventListener("mousedown", aiTurn);
+		aiTurnLabel.removeEventListener("mouseup", aiTurn);
 	}
 	
 	createGamePiece(row, col, type);
@@ -664,18 +665,18 @@ function gameTurn(type){
 			alert("No Available Moves. " + turn.innerHTML + " Turn Skipped!");
 			clearPotentialMoves();
 			if(type == "W"){
-				board.removeEventListener("mousedown", addPiece);
+				board.removeEventListener("mouseup", addPiece);
 			}
 			toggleTurn();
 			gameTurn(oppType);
 		}
 	}
 	
-	if(type == "B" && oppPlayerType.innerHTML == "vs AI"){
-		aiTurnLabel.addEventListener('mousedown', aiTurn, false);
+	if(type == "W" && oppPlayerType.innerHTML == "vs AI"){
+		aiTurnLabel.addEventListener('mouseup', aiTurn, false);
 	}
 	else{
-		board.addEventListener('mousedown', addPiece, false);
+		board.addEventListener('mouseup', addPiece, false);
 	}
 }
 
@@ -688,4 +689,4 @@ function endGame(){
 }
 
 initGame();
-gameTurn("W");
+gameTurn("B");
